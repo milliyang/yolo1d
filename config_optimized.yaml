@@ -1,0 +1,48 @@
+# 优化的YOLO1D配置文件
+# 基于train_simple.py的成功经验
+
+# 1. Model Configuration
+model_size: 'n'          # Model size (n, s, m, l, x)
+num_classes: 2           # Number of classes
+input_channels: 1        # Number of input channels for the signal
+input_length: 1024       # Input sequence length
+
+# 2. Data Configuration
+dataset_path: 'sin_wave_dataset'  # Path to the generated dataset directory
+num_workers: 4                    # Number of workers for DataLoader
+
+# 3. Training Configuration
+epochs: 100                       # Number of training epochs
+batch_size: 16                    # Batch size for training
+learning_rate: 0.001             # Initial learning rate
+weight_decay: 0.0005              # Optimizer weight decay (关键参数: 从0.01调整为0.0005, 与成功的config.yaml保持一致, 避免过度正则化)
+
+# 4. 优化的损失函数超参数 (基于train_simple.py的成功配置)
+hyp:
+  box: 1.0              # 边界框损失权重 (YOLOv8原始权重)
+  cls: 3.0              # 分类损失权重 (YOLOv8原始权重)
+  dfl: 0.8              # DFL损失权重 (YOLOv8原始权重)
+
+# 5. 数据增强配置
+data_augmentation:
+  enabled: false          # (关键调整) 暂时禁用数据增强，以排查性能问题
+  noise_std: 0.05       # 噪声标准差
+  scale_range: [0.8, 1.2]  # 缩放范围
+
+# 6. 学习率调度器配置
+scheduler:
+  type: 'onecycle'      # 使用OneCycleLR (train_simple.py的成功策略)
+  max_lr: 0.001         # 最大学习率
+  epochs: 100           # 训练轮数
+  # 或者使用cosine调度器
+  # type: 'cosine'
+  # eta_min: 0.00001    # 最小学习率
+
+# 7. 其他参数
+reg_max: 16              # DFL regression maximum value
+patience: 10             # 早停耐心值
+min_delta: 0.001         # 早停最小改善
+grad_clip: 1.0           # 梯度裁剪
+
+# 8. 运行配置
+run_name: 'optimized_run'  # 实验运行名称 
